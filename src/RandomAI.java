@@ -20,13 +20,6 @@ public class RandomAI {
         Point point = hint.get(new Random().nextInt(hint.size()));
         row = point.row;
         column = point.column;
-        try {
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public int getRow() {
