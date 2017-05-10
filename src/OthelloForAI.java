@@ -13,30 +13,31 @@ import java.util.stream.IntStream;
 public class OthelloForAI {
     public static final int BOARD_SIZE = 8;
     private Stone[][] board = new Stone[BOARD_SIZE][BOARD_SIZE];
-    private Stone nowStone = Stone.Black;
-    private boolean turn = true;
+    private Stone nowStone = Stone.White;   // 黒から対局が始まるようにする
+    private boolean turn = false;
     private boolean passFlag = false;
     private String result;
 
     public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-        List<String> results = IntStream.range(0,1000000)
-                .parallel()
-                .mapToObj(i -> new OthelloForAI())
-                .map(o -> o.getResult())
-                .collect(Collectors.toList());
-        try (FileWriter fw = new FileWriter("output.csv", true);
-             BufferedWriter br = new BufferedWriter(fw)) {
-            for (String result : results) {
-                br.append(result);
-                br.newLine();
-            }
-        }
-        catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        long finish = System.currentTimeMillis();
-        System.out.println(finish - start + " ");
+        new OthelloForAI();
+//        long start = System.currentTimeMillis();
+//        List<String> results = IntStream.range(0,1000000)
+//                .parallel()
+//                .mapToObj(i -> new OthelloForAI())
+//                .map(o -> o.getResult())
+//                .collect(Collectors.toList());
+//        try (FileWriter fw = new FileWriter("output.csv", true);
+//             BufferedWriter br = new BufferedWriter(fw)) {
+//            for (String result : results) {
+//                br.append(result);
+//                br.newLine();
+//            }
+//        }
+//        catch (IOException ioe) {
+//            ioe.printStackTrace();
+//        }
+//        long finish = System.currentTimeMillis();
+//        System.out.println(finish - start + " ");
     }
 
     public String getResult() {
@@ -46,13 +47,6 @@ public class OthelloForAI {
     private OthelloForAI() {
         initBoard();
         nextTurn();
-    }
-
-    private void putStone(int r, int c, Stone stone) {
-        EnumSet<Direction> directions = BoardHelper.selectDirections(r, c, stone, board);
-        if (directions.isEmpty()) return;
-        board[r][c] = stone;
-        reverseStone(r, c, stone, directions);
     }
 
     private void nextTurn() {
@@ -70,50 +64,22 @@ public class OthelloForAI {
         }
         else {
             passFlag = false;
+            BaseAI ai;
             if (turn) {
-                RandomAI ai = new RandomAI(hint);
-                putStone(ai.getRow(), ai.getColumn(), nowStone);
-                nextTurn();
+                ai = new SquareEvaluationAI(board, nowStone, hint);
             }
             else {
-                RandomAI ai = new RandomAI(hint);
-                putStone(ai.getRow(), ai.getColumn(), nowStone);
-                nextTurn();
+                ai = new RandomAI(hint);
             }
-        }
-    }
-
-    private void reverseStone(int r, int c, Stone stone, EnumSet<Direction> directions) {
-        directions.forEach(d -> reverseLine(r, c, stone, d));
-    }
-
-    private void reverseLine(int r, int c, Stone stone, Direction direction) {
-        int dr = direction.getDR(); int dc = direction.getDC();
-        int i = r + dr;             int j = c + dc;
-        Stone reverse = stone.getReverse();
-
-        while (0 <= i && i < BOARD_SIZE && 0 <= j && j < BOARD_SIZE) {
-            if (board[i][j] == reverse) {
-                board[i][j] = stone;
-            }
-            else {
-                break;
-            }
-            i += dr; j += dc;
+            ai.think();
+            BoardHelper.putStone(ai.getRow(), ai.getColumn(), nowStone, board);
+            nextTurn();
         }
     }
 
     private void gameOver() {
-        int black = countStone(Stone.Black); int white = countStone(Stone.White);
+        int black = BoardHelper.countStone(Stone.Black, board); int white = BoardHelper.countStone(Stone.White, board);
         result = black + "," + white + "," + (black > white ? 1 : 0);
-    }
-
-    private int countStone(Stone stone) {
-        return (int)Arrays.stream(board)
-                .mapToLong(ss -> Arrays.stream(ss)
-                        .filter(s -> s == stone)
-                        .count())
-                .sum();
     }
 
     private void initBoard() {
@@ -122,14 +88,6 @@ public class OthelloForAI {
                 board[i][j] = Stone.Empty;
         board[3][3] = Stone.Black; board[3][4] = Stone.White;
         board[4][3] = Stone.White; board[4][4] = Stone.Black;
-    }
-
-    private void printBoard() {
-        for (Stone[] stones : board) {
-            for (Stone stone : stones) System.out.print(stone + " ");
-            System.out.println();
-        }
-        System.out.println();
     }
 }
 

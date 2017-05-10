@@ -1,10 +1,10 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
 /**
  * Created by shiita on 2017/05/10.
- * ボードの状態を変化させないものをOthelloForAIクラスから分離
  */
 public class BoardHelper {
     public static List<Point> makeHint(Stone stone, Stone[][] board) {
@@ -39,5 +39,49 @@ public class BoardHelper {
             i += dr; j += dc;
         }
         return false;
+    }
+
+    public static void putStone(int r, int c, Stone stone, Stone[][] board) {
+        EnumSet<Direction> directions = BoardHelper.selectDirections(r, c, stone, board);
+        if (directions.isEmpty()) return;
+        board[r][c] = stone;
+        reverseStone(r, c, stone, directions, board);
+    }
+
+    public static void reverseStone(int r, int c, Stone stone, EnumSet<Direction> directions, Stone[][] board) {
+        directions.forEach(d -> reverseLine(r, c, stone, d, board));
+    }
+
+
+    public static void reverseLine(int r, int c, Stone stone, Direction direction, Stone[][] board) {
+        int dr = direction.getDR(); int dc = direction.getDC();
+        int i = r + dr;             int j = c + dc;
+        Stone reverse = stone.getReverse();
+
+        while (0 <= i && i < OthelloForAI.BOARD_SIZE && 0 <= j && j < OthelloForAI.BOARD_SIZE) {
+            if (board[i][j] == reverse) {
+                board[i][j] = stone;
+            }
+            else {
+                break;
+            }
+            i += dr; j += dc;
+        }
+    }
+
+    public static int countStone(Stone stone, Stone[][] board) {
+        return (int) Arrays.stream(board)
+                .mapToLong(ss -> Arrays.stream(ss)
+                        .filter(s -> s == stone)
+                        .count())
+                .sum();
+    }
+
+    public static void printBoard(Stone[][] board) {
+        for (Stone[] stones : board) {
+            for (Stone stone : stones) System.out.print(stone + " ");
+            System.out.println();
+        }
+        System.out.println();
     }
 }
