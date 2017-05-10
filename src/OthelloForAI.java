@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -16,39 +17,36 @@ public class OthelloForAI {
     private Stone nowStone = Stone.Black;
     private boolean turn = true;
     private boolean passFlag = false;
-    private int totalResult = 0;
-    private int totalPlay = 0;
-    private StringBuffer sb = new StringBuffer();
+    private String result;
 
     public static void main(String[] args) {
-        // TODO: StreamAPiの並列処理をつかって処理の高速化を図る
-        new OthelloForAI();
+        long start = System.currentTimeMillis();
+        List<String> results = IntStream.range(0,1000000)
+                .parallel()
+                .mapToObj(i -> new OthelloForAI())
+                .map(o -> o.getResult())
+                .collect(Collectors.toList());
+        try (FileWriter fw = new FileWriter("output.csv", true);
+             BufferedWriter br = new BufferedWriter(fw)) {
+            for (String result : results) {
+                br.append(result);
+                br.newLine();
+            }
+        }
+        catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        long finish = System.currentTimeMillis();
+        System.out.println(finish - start + " ");
+    }
+
+    public String getResult() {
+        return result;
     }
 
     private OthelloForAI() {
-        IntStream.range(0, 1000000).forEach(i ->{
-            initBoard();
-            nextTurn();
-            if (totalPlay % 10000 == 0) {
-                System.out.print("\r" + totalPlay + "戦完了    ");
-                System.out.flush();
-                try (FileWriter fw = new FileWriter("output.csv", true);
-                     BufferedWriter br = new BufferedWriter(fw)) {
-                    String string = sb.toString();
-                    String[] results = string.split(" ");
-                    for (String result : results) {
-                        br.append(result);
-                        br.newLine();
-                    }
-                }
-                catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-                sb = new StringBuffer();
-            }
-        });
-        System.out.println(sb.toString());
-        System.out.println("black win " + totalResult + "/" + totalPlay);
+        initBoard();
+        nextTurn();
     }
 
     private List<Point> makeHint(Stone stone) {
@@ -142,15 +140,7 @@ public class OthelloForAI {
 
     private void gameOver() {
         int black = countStone(Stone.Black); int white = countStone(Stone.White);
-        int result = black > white ? 1 : 0;
-        totalResult += result;
-        totalPlay++;
-        sb.append(black);
-        sb.append(",");
-        sb.append(white);
-        sb.append(",");
-        sb.append(result);
-        sb.append(" ");
+        result = black + "," + white + "," + (black > white ? 1 : 0);
     }
 
     private int countStone(Stone stone) {
