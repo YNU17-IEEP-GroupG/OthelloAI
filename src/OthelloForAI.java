@@ -1,7 +1,6 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.stream.IntStream;
  * Created by shiita on 2017/05/09.
  */
 public class OthelloForAI {
-    private static final int BOARD_SIZE = 8;
+    public static final int BOARD_SIZE = 8;
     private Stone[][] board = new Stone[BOARD_SIZE][BOARD_SIZE];
     private Stone nowStone = Stone.Black;
     private boolean turn = true;
@@ -49,51 +48,17 @@ public class OthelloForAI {
         nextTurn();
     }
 
-    private List<Point> makeHint(Stone stone) {
-        List<Point> hint = new ArrayList<>();
-        for (int i = 0; i < BOARD_SIZE; i++)
-            for (int j = 0; j < BOARD_SIZE; j++)
-                if (!selectDirections(i, j, stone).isEmpty())
-                    hint.add(new Point(i, j));
-        return hint;
-    }
-
     private void putStone(int r, int c, Stone stone) {
-        EnumSet<Direction> directions = selectDirections(r, c, stone);
+        EnumSet<Direction> directions = BoardHelper.selectDirections(r, c, stone, board);
         if (directions.isEmpty()) return;
         board[r][c] = stone;
         reverseStone(r, c, stone, directions);
     }
 
-    private EnumSet<Direction> selectDirections(int r, int c, Stone stone) {
-        EnumSet<Direction> directions = EnumSet.noneOf(Direction.class);
-        if (board[r][c] != Stone.Empty) return directions;
-        EnumSet.allOf(Direction.class)
-                .stream()
-                .filter(d -> checkLine(r, c, stone, d))
-                .forEach(directions::add);
-        return directions;
-    }
-
-    private boolean checkLine (int r, int c, Stone stone, Direction direction) {
-        int dr = direction.getDR(); int dc = direction.getDC();
-        int i = r + dr;             int j = c + dc;
-
-        while (0 <= i && i < BOARD_SIZE && 0 <= j && j < BOARD_SIZE) {
-            if      (board[i][j] == Stone.Empty) break;
-            else if (board[i][j] == stone){
-                if (Math.abs(r - i) > 1 || Math.abs(c - j) > 1) return true;
-                else break;
-            }
-            i += dr; j += dc;
-        }
-        return false;
-    }
-
     private void nextTurn() {
         turn = !turn;
         nowStone = nowStone.getReverse();
-        List<Point> hint = makeHint(nowStone);
+        List<Point> hint = BoardHelper.makeHint(nowStone, board);
         if (hint.isEmpty()) {
             if (passFlag) {
                 gameOver();
