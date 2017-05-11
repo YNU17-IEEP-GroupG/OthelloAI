@@ -1,3 +1,5 @@
+package ai;
+
 /**
  * Created by shiita on 2017/05/10.
  */

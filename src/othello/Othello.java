@@ -1,3 +1,8 @@
+package othello;
+
+import ai.SquareEvaluationAI;
+import util.*;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -29,7 +34,7 @@ public class Othello extends JFrame implements ActionListener {
     private boolean passFlag = false;
 
     private Othello() {
-        setTitle("Othello");
+        setTitle("othello.Othello");
         getContentPane().setPreferredSize(new Dimension(BOARD_SIZE * IMAGE_ICON_SIZE,BOARD_SIZE * IMAGE_ICON_SIZE));
         // setResizable() -> pack()の順でないと大きさがずれる
         setResizable(false);
@@ -52,12 +57,12 @@ public class Othello extends JFrame implements ActionListener {
         putStone(r, c, myStone);
     }
 
-    public List<Point> makeHint(Stone stone) {
-        List<Point> hint = new ArrayList<>();
+    public List<util.Point> makeHint(Stone stone) {
+        List<util.Point> hint = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++)
             for (int j = 0; j < BOARD_SIZE; j++)
                 if (!selectDirections(i, j, stone).isEmpty())
-                    hint.add(new Point(i, j));
+                    hint.add(new util.Point(i, j));
         return hint;
     }
 
@@ -102,7 +107,7 @@ public class Othello extends JFrame implements ActionListener {
         myTurn = !myTurn;
         myStone = myStone.getReverse();
         hideHint();
-        List<Point> hint = makeHint(myStone);
+        List<util.Point> hint = makeHint(myStone);
         if (hint.isEmpty()) {
             if (passFlag) {
                 gameOver();
@@ -162,7 +167,7 @@ public class Othello extends JFrame implements ActionListener {
         }
     }
 
-    private void displayHint(List<Point> hint) {
+    private void displayHint(List<util.Point> hint) {
         hint.forEach(p -> buttonBoard[p.row][p.column].setIcon(canPutIcon));
     }
 
@@ -212,8 +217,8 @@ public class Othello extends JFrame implements ActionListener {
         buttonBoard[4][3].setRolloverIcon(null); buttonBoard[4][4].setRolloverIcon(null);
 
 //        // パステスト
-//        board[0][0] = Stone.White; buttonBoard[0][0].setIcon(whiteIcon);
-//        board[0][1] = Stone.Black; buttonBoard[0][1].setIcon(blackIcon);
+//        board[0][0] = util.Stone.White; buttonBoard[0][0].setIcon(whiteIcon);
+//        board[0][1] = util.Stone.Black; buttonBoard[0][1].setIcon(blackIcon);
     }
 
     private void printBoard() {

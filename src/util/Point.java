@@ -1,9 +1,13 @@
+package util;
+
+import othello.Othello;
+
 /**
  * Created by shiita on 2017/04/29.
  */
 public class Point {
-    int row = 0;
-    int column = 0;
+    public int row = 0;
+    public int column = 0;
 
     public Point(int row, int column) throws PointException {
         if (0 <= row && row <= Othello.BOARD_SIZE)

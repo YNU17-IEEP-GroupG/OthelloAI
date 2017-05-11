@@ -1,3 +1,5 @@
+package util;
+
 /**
  * Created by shiita on 2017/04/29.
  */

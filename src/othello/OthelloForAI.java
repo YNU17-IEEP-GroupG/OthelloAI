@@ -1,3 +1,12 @@
+package othello;
+
+import ai.BaseAI;
+import ai.RandomAI;
+import ai.SquareEvaluationAI;
+import util.BoardHelper;
+import util.Point;
+import util.Stone;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,8 +18,7 @@ import java.util.stream.IntStream;
  * Created by shiita on 2017/05/09.
  */
 public class OthelloForAI {
-    public static final int BOARD_SIZE = 8;
-    private Stone[][] board = new Stone[BOARD_SIZE][BOARD_SIZE];
+    private Stone[][] board = new Stone[Othello.BOARD_SIZE][Othello.BOARD_SIZE];
     private Stone nowStone = Stone.White;   // 黒から対局が始まるようにする
     private boolean turn = false;
     private boolean passFlag = false;
@@ -82,8 +90,8 @@ public class OthelloForAI {
     }
 
     private void initBoard() {
-        for (int i = 0; i < BOARD_SIZE; i++)
-            for (int j = 0; j < BOARD_SIZE; j++)
+        for (int i = 0; i < Othello.BOARD_SIZE; i++)
+            for (int j = 0; j < Othello.BOARD_SIZE; j++)
                 board[i][j] = Stone.Empty;
         board[3][3] = Stone.Black; board[3][4] = Stone.White;
         board[4][3] = Stone.White; board[4][4] = Stone.Black;

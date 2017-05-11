@@ -1,3 +1,7 @@
+package util;
+
+import othello.Othello;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -10,8 +14,8 @@ import java.util.stream.Collectors;
 public class BoardHelper {
     public static List<Point> makeHint(Stone stone, Stone[][] board) {
         List<Point> hint = new ArrayList<>();
-        for (int i = 0; i < OthelloForAI.BOARD_SIZE; i++)
-            for (int j = 0; j < OthelloForAI.BOARD_SIZE; j++)
+        for (int i = 0; i < Othello.BOARD_SIZE; i++)
+            for (int j = 0; j < Othello.BOARD_SIZE; j++)
                 if (!selectDirections(i, j, stone, board).isEmpty())
                     hint.add(new Point(i, j));
         return hint;
@@ -31,7 +35,7 @@ public class BoardHelper {
         int dr = direction.getDR(); int dc = direction.getDC();
         int i = r + dr;             int j = c + dc;
 
-        while (0 <= i && i < OthelloForAI.BOARD_SIZE && 0 <= j && j < OthelloForAI.BOARD_SIZE) {
+        while (0 <= i && i < Othello.BOARD_SIZE && 0 <= j && j < Othello.BOARD_SIZE) {
             if      (board[i][j] == Stone.Empty) break;
             else if (board[i][j] == stone){
                 if (Math.abs(r - i) > 1 || Math.abs(c - j) > 1) return true;
@@ -62,7 +66,7 @@ public class BoardHelper {
         Stone reverse = stone.getReverse();
         List<Point> pList = new ArrayList<>();
 
-        while (0 <= i && i < OthelloForAI.BOARD_SIZE && 0 <= j && j < OthelloForAI.BOARD_SIZE) {
+        while (0 <= i && i < Othello.BOARD_SIZE && 0 <= j && j < Othello.BOARD_SIZE) {
             if (board[i][j] == reverse) {
                 board[i][j] = stone;
                 pList.add(new Point(i, j));

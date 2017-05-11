@@ -1,3 +1,7 @@
+package util;
+
+import othello.Othello;
+
 import javax.swing.*;
 
 /**

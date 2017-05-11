@@ -1,3 +1,7 @@
+package ai;
+
+import util.Point;
+
 import java.util.List;
 import java.util.Random;
 

@@ -1,10 +1,16 @@
+package ai;
+
+import othello.Othello;
+import util.Point;
+import util.Stone;
+
 import java.util.List;
 
 /**
  * Created by shiita on 2017/05/10.
  */
 public class SquareEvaluationAI implements BaseAI {
-    private Stone[][] board = new Stone[OthelloForAI.BOARD_SIZE][OthelloForAI.BOARD_SIZE];
+    private Stone[][] board = new Stone[Othello.BOARD_SIZE][Othello.BOARD_SIZE];
     private Stone stone;
     private List<Point> hint;
     private int row;

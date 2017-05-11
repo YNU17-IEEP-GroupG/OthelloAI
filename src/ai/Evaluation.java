@@ -1,10 +1,17 @@
+package ai;
+
+import othello.Othello;
+import util.BoardHelper;
+import util.Point;
+import util.Stone;
+
 import java.util.List;
 
 /**
  * Created by shiita on 2017/05/10.
  */
 public class Evaluation {
-    private Stone[][] board = new Stone[OthelloForAI.BOARD_SIZE][OthelloForAI.BOARD_SIZE];
+    private Stone[][] board = new Stone[Othello.BOARD_SIZE][Othello.BOARD_SIZE];
     private static final int[][] square =
             {{ 30, -12,  0, -1, -1,  0, -12,  30},
              {-12, -15, -3, -3, -3, -3, -15, -12},
@@ -24,8 +31,8 @@ public class Evaluation {
         int black = 0;
         int white = 0;
         List<Point> pList = BoardHelper.putStone(point.row, point.column, stone, board);
-        for (int i = 0; i < OthelloForAI.BOARD_SIZE; i++) {
-            for (int j = 0; j < OthelloForAI.BOARD_SIZE; j++) {
+        for (int i = 0; i < Othello.BOARD_SIZE; i++) {
+            for (int j = 0; j < Othello.BOARD_SIZE; j++) {
                 if (board[i][j] == Stone.Black)
                     black += square[i][j];
                 else if (board[i][j] == Stone.White)
