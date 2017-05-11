@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by shiita on 2017/05/10.
@@ -41,32 +42,37 @@ public class BoardHelper {
         return false;
     }
 
-    public static void putStone(int r, int c, Stone stone, Stone[][] board) {
+    public static List<Point> putStone(int r, int c, Stone stone, Stone[][] board) {
         EnumSet<Direction> directions = BoardHelper.selectDirections(r, c, stone, board);
-        if (directions.isEmpty()) return;
+        if (directions.isEmpty()) return new ArrayList<>();
         board[r][c] = stone;
-        reverseStone(r, c, stone, directions, board);
+        return reverseStone(r, c, stone, directions, board);
     }
 
-    public static void reverseStone(int r, int c, Stone stone, EnumSet<Direction> directions, Stone[][] board) {
-        directions.forEach(d -> reverseLine(r, c, stone, d, board));
+    public static List<Point> reverseStone(int r, int c, Stone stone, EnumSet<Direction> directions, Stone[][] board) {
+        return directions.stream()
+                .map(d -> reverseLine(r, c, stone, d, board))
+                .flatMap(pl -> pl.stream())
+                .collect(Collectors.toList());
     }
 
-
-    public static void reverseLine(int r, int c, Stone stone, Direction direction, Stone[][] board) {
+    public static List<Point> reverseLine(int r, int c, Stone stone, Direction direction, Stone[][] board) {
         int dr = direction.getDR(); int dc = direction.getDC();
         int i = r + dr;             int j = c + dc;
         Stone reverse = stone.getReverse();
+        List<Point> pList = new ArrayList<>();
 
         while (0 <= i && i < OthelloForAI.BOARD_SIZE && 0 <= j && j < OthelloForAI.BOARD_SIZE) {
             if (board[i][j] == reverse) {
                 board[i][j] = stone;
+                pList.add(new Point(i, j));
             }
             else {
                 break;
             }
             i += dr; j += dc;
         }
+        return pList;
     }
 
     public static int countStone(Stone stone, Stone[][] board) {
@@ -75,6 +81,12 @@ public class BoardHelper {
                         .filter(s -> s == stone)
                         .count())
                 .sum();
+    }
+
+    public static Stone[][] cloneBoard(Stone[][] board) {
+        return Arrays.stream(board)
+                .map(ss -> ss.clone())
+                .toArray(Stone[][]::new);
     }
 
     public static void printBoard(Stone[][] board) {

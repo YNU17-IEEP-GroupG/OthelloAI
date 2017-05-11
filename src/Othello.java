@@ -120,7 +120,8 @@ public class Othello extends JFrame implements ActionListener {
             else {
                 removeAllListener();
                 new Thread(() -> {
-                    RandomAI ai = new RandomAI(hint);
+                    SquareEvaluationAI ai = new SquareEvaluationAI(BoardHelper.cloneBoard(board), myStone, hint);
+                    ai.think();
                     putStone(ai.getRow(), ai.getColumn(), myStone);
                     addAllListener();
                 }).start();

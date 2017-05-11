@@ -1,8 +1,6 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -20,24 +18,25 @@ public class OthelloForAI {
 
     public static void main(String[] args) {
         new OthelloForAI();
-//        long start = System.currentTimeMillis();
-//        List<String> results = IntStream.range(0,1000000)
-//                .parallel()
-//                .mapToObj(i -> new OthelloForAI())
-//                .map(o -> o.getResult())
-//                .collect(Collectors.toList());
-//        try (FileWriter fw = new FileWriter("output.csv", true);
-//             BufferedWriter br = new BufferedWriter(fw)) {
-//            for (String result : results) {
-//                br.append(result);
-//                br.newLine();
-//            }
-//        }
-//        catch (IOException ioe) {
-//            ioe.printStackTrace();
-//        }
-//        long finish = System.currentTimeMillis();
-//        System.out.println(finish - start + " ");
+        long start = System.currentTimeMillis();
+        List<String> results = IntStream.range(0,10000)
+                .parallel()
+                .mapToObj(i -> new OthelloForAI())
+                .map(o -> o.getResult())
+                .collect(Collectors.toList());
+
+        try (FileWriter fw = new FileWriter("output.csv", true);
+                      BufferedWriter br = new BufferedWriter(fw)) {
+            for (String result : results) {
+                br.append(result);
+                br.newLine();
+            }
+        }
+        catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        long finish = System.currentTimeMillis();
+        System.out.println(finish - start + " ");
     }
 
     public String getResult() {
@@ -66,7 +65,7 @@ public class OthelloForAI {
             passFlag = false;
             BaseAI ai;
             if (turn) {
-                ai = new SquareEvaluationAI(board, nowStone, hint);
+                ai = new SquareEvaluationAI(BoardHelper.cloneBoard(board), nowStone, hint);
             }
             else {
                 ai = new RandomAI(hint);
