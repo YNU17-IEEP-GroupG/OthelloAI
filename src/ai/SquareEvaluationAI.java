@@ -5,6 +5,7 @@ import util.Point;
 import util.Stone;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by shiita on 2017/05/10.
@@ -36,6 +37,13 @@ public class SquareEvaluationAI implements BaseAI {
         }
         row = bestPoint.row;
         column = bestPoint.column;
+    }
+
+    @Override
+    public void randomThink() {
+        Point point = hint.get(new Random().nextInt(hint.size()));
+        row = point.row;
+        column = point.column;
     }
 
     @Override

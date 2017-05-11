@@ -21,6 +21,11 @@ public class RandomAI implements BaseAI{
 
     @Override
     public void think() {
+        randomThink();
+    }
+
+    @Override
+    public void randomThink() {
         Point point = hint.get(new Random().nextInt(hint.size()));
         row = point.row;
         column = point.column;

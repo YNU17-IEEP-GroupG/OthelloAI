@@ -5,6 +5,7 @@ package ai;
  */
 public interface BaseAI {
     void think();
+    void randomThink();
     int getRow();
     int getColumn();
 }
