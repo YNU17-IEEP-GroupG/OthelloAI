@@ -20,50 +20,50 @@ public class Search {
     public Point minMax(int depth, int evaluationCode, Stone stone, Stone[][] board) {
         if (depth % 2 == 1 || depth < 2) throw new RuntimeException();
         Point bestPoint = new Point(0,0);
-        int bestValue = -(1 << 30);
+        int alpha = -(1 << 30);
+        int beta =    1 << 30;
 
         List<Point> hint = BoardHelper.makeHint(stone, board);
         for (Point p : hint) {
             List<Point> pList = BoardHelper.putStone(p.row, p.column, stone, board);
-            int value = mm(depth - 1, evaluationCode, stone.getReverse(), board);
+            int value = alphaBeta(depth - 1, evaluationCode, stone.getReverse(), board, alpha, beta);
             BoardHelper.undo(p.row, p.column, stone, pList, board);
-//            System.out.println("last (r, c) = (" + p.row + ", " +p.column + ")  value = " + value);
-            if (value > bestValue) {
+            if (value > alpha) {
                 bestPoint = p;
-                bestValue = value;
+                alpha = value;
             }
         }
         return bestPoint;
     }
 
-    private int mm(int depth, int evaluationCode, Stone stone, Stone[][] board) {
+    private int alphaBeta(int depth, int evaluationCode, Stone stone, Stone[][] board, int alpha, int beta) {
         if (depth == 0) {
             return evaluate(evaluationCode, targetStone, board);
         }
 
-        int bestValue;
-        int tmpValue;
-        if (depth % 2 == 0) bestValue = -(1 << 29);
-        else                bestValue =   1 << 29;
+        int value;
+        if (depth % 2 == 0) alpha = -(1 << 29);
+        else                beta  =   1 << 29;
 
-        int i = 1;
         List<Point> hint = BoardHelper.makeHint(stone, board);
         // 読みの中で勝敗が決まった場合
         if (hint.isEmpty()) {
-            return bestValue;
+            return depth % 2 == 0 ? alpha : beta;
         }
         for (Point p : hint) {
             List<Point> pList = BoardHelper.putStone(p.row, p.column, stone, board);
-            tmpValue = mm(depth - 1, evaluationCode, stone.getReverse(), board);
-//            System.out.println("" + i++ + "(r, c) = (" + p.row + ", " +p.column + ")  value = " + tmpValue);
+            value = alphaBeta(depth - 1, evaluationCode, stone.getReverse(), board, alpha, beta);
             BoardHelper.undo(p.row, p.column, stone, pList, board);
-            if ((depth % 2 == 0 && tmpValue > bestValue) || (depth % 2 == 1 && tmpValue < bestValue)) {
-                bestValue = tmpValue;
+            if (depth % 2 == 0 && value > alpha) {
+                alpha = value;
+                if (alpha > beta) return alpha;
+            }
+            else if (depth % 2 == 1 && value < beta) {
+                beta = value;
+                if (alpha > beta) return beta;
             }
         }
-//        System.out.println("bestvalue = " + bestValue);
-
-        return bestValue;
+        return depth % 2 == 0 ? alpha : beta;
     }
 
     private int evaluate(int evaluationCode, Stone stone, Stone[][] board) {
@@ -71,7 +71,6 @@ public class Search {
         switch (evaluationCode) {
             case Evaluation.SQUARE_EVALUATION:
                 value = Evaluation.squareEvaluation(stone, board);
-//                System.out.println("value = " + value);
                 break;
         }
         return value;

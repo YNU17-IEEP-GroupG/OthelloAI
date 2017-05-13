@@ -26,12 +26,7 @@ public class OthelloForAI {
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-//        List<String> results = new ArrayList<>();
-//        for (int i = 0; i < 1000; i++) {
-//            OthelloForAI o = new OthelloForAI();
-//            results.add(o.getResult());
-//        }
-        List<String> results = IntStream.range(0, 1000)
+        List<String> results = IntStream.range(0, 100)
                 .parallel()
                 .mapToObj(i -> new OthelloForAI())
                 .map(o -> o.getResult())
