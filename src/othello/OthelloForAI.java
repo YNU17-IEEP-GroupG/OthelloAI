@@ -11,7 +11,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -26,14 +25,17 @@ public class OthelloForAI {
     private String result;
 
     public static void main(String[] args) {
-        new OthelloForAI();
         long start = System.currentTimeMillis();
-        List<String> results = IntStream.range(0,1000000)
+//        List<String> results = new ArrayList<>();
+//        for (int i = 0; i < 1000; i++) {
+//            OthelloForAI o = new OthelloForAI();
+//            results.add(o.getResult());
+//        }
+        List<String> results = IntStream.range(0, 1000)
                 .parallel()
                 .mapToObj(i -> new OthelloForAI())
                 .map(o -> o.getResult())
                 .collect(Collectors.toList());
-
         try (FileWriter fw = new FileWriter("output.csv", true);
                       BufferedWriter br = new BufferedWriter(fw)) {
             for (String result : results) {
@@ -74,14 +76,14 @@ public class OthelloForAI {
             passFlag = false;
             BaseAI ai;
             if (turn) {
-                ai = new SquareEvaluationAI(BoardHelper.cloneBoard(board), nowStone, hint);
+                ai = new SquareEvaluationAI(board, nowStone, hint);
             }
             else {
-                ai = new SquareEvaluationAI(BoardHelper.cloneBoard(board), nowStone, hint);
+                ai = new RandomAI(hint);
             }
-            if (new Random().nextDouble() <= 0.2)
-                ai.randomThink();
-            else
+//            if (new Random().nextDouble() <= 0.2)
+//                ai.randomThink();
+//            else
                 ai.think();
             BoardHelper.putStone(ai.getRow(), ai.getColumn(), nowStone, board);
             nextTurn();

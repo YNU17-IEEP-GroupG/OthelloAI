@@ -79,6 +79,12 @@ public class BoardHelper {
         return pList;
     }
 
+    public static void undo(int r, int c, Stone stone, List<Point> pList, Stone[][] board) {
+        Stone reverse = stone.getReverse();
+        pList.stream().forEach(p -> board[p.row][p.column] = reverse);
+        board[r][c] = Stone.Empty;
+    }
+
     public static int countStone(Stone stone, Stone[][] board) {
         return (int) Arrays.stream(board)
                 .mapToLong(ss -> Arrays.stream(ss)

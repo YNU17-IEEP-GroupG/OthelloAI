@@ -21,22 +21,16 @@ public class SquareEvaluationAI implements BaseAI {
         this.board = board;
         this.stone = stone;
         this.hint = hint;
+        row = hint.get(0).row;
+        column = hint.get(0).column;
     }
 
     @Override
     public void think() {
-        Evaluation e = new Evaluation(board);
-        Point bestPoint = hint.get(0);
-        int bestValue = e.squareEvaluation(bestPoint, stone);
-        for (Point p : hint) {
-            int value = e.squareEvaluation(p, stone);
-            if (value > bestValue) {
-                bestPoint = p;
-                bestValue = value;
-            }
-        }
-        row = bestPoint.row;
-        column = bestPoint.column;
+        Search s = new Search(stone);
+        Point point = s.minMax(4, Evaluation.SQUARE_EVALUATION, stone, board);
+        row = point.row;
+        column = point.column;
     }
 
     @Override

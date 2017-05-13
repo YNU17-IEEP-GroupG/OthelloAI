@@ -2,16 +2,13 @@ package ai;
 
 import othello.Othello;
 import util.BoardHelper;
-import util.Point;
 import util.Stone;
-
-import java.util.List;
 
 /**
  * Created by shiita on 2017/05/10.
  */
 public class Evaluation {
-    private Stone[][] board = new Stone[Othello.BOARD_SIZE][Othello.BOARD_SIZE];
+    public static final int SQUARE_EVALUATION = 1;
     private static final int[][] square =
             {{ 30, -12,  0, -1, -1,  0, -12,  30},
              {-12, -15, -3, -3, -3, -3, -15, -12},
@@ -22,30 +19,28 @@ public class Evaluation {
              {-12, -15, -3, -3, -3, -3, -15, -12},
              { 30, -12,  0, -1, -1,  0, -12,  30},};
 
-    public Evaluation(Stone[][] board) {
-        this.board = board;
-    }
+    // 自分と相手の局面の評価の差分を返す
+    public static int squareEvaluation(Stone stone, Stone[][] board) {
+        Stone reverse = stone.getReverse();
+        int value = 0;
 
-    // pのマスに置いた時の自分と相手の局面の評価の差分を返す
-    public int squareEvaluation(Point point, Stone stone) {
-        int black = 0;
-        int white = 0;
-        List<Point> pList = BoardHelper.putStone(point.row, point.column, stone, board);
         for (int i = 0; i < Othello.BOARD_SIZE; i++) {
             for (int j = 0; j < Othello.BOARD_SIZE; j++) {
-                if (board[i][j] == Stone.Black)
-                    black += square[i][j];
-                else if (board[i][j] == Stone.White)
-                    white += square[i][j];
+                if (board[i][j] == stone)
+                    value += square[i][j];
+                else if (board[i][j] == reverse)
+                    value -= square[i][j];
             }
         }
 
-        // 置いた石と返した石を元に戻す。新しい盤を作るよりも戻す処理の方が速い
-        Stone reverse = stone.getReverse();
-        pList.stream()
-                .forEach(p -> board[p.row][p.column] = reverse);
-        board[point.row][point.column] = Stone.Empty;
+        // 勝敗が決まった場合には、絶対的に大きい(小さい)評価値を返す
+        if (BoardHelper.countStone(stone, board) == 0) {
+            return -(1 << 29);
+        }
+        else if (BoardHelper.countStone(reverse, board) == 0) {
+            return (1 << 29);
+        }
 
-        return stone == Stone.Black ? black - white : white - black;
+        return value;
     }
 }
