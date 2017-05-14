@@ -1,5 +1,6 @@
 package othello;
 
+import ai.RandomAI;
 import ai.SquareEvaluationAI;
 import util.*;
 
@@ -41,8 +42,8 @@ public class Othello extends JFrame implements ActionListener {
         pack();
 
         Random random = new Random();
-        myStone = random.nextBoolean() ? Stone.Black : Stone.White;
-        myTurn = random.nextBoolean();
+        myStone = Stone.White;
+        myTurn = true;
         initBoard();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -121,15 +122,31 @@ public class Othello extends JFrame implements ActionListener {
             passFlag = false;
             if (myTurn) {
                 displayHint(hint);
+                if (countStone(Stone.Empty) > 12) {
+                    new Thread(() -> {
+                        RandomAI ai = new RandomAI(hint);
+                        ai.think();
+                        putStone(ai.getRow(), ai.getColumn(), myStone);
+                    }).start();
+                }
             }
             else {
                 removeAllListener();
-                new Thread(() -> {
-                    SquareEvaluationAI ai = new SquareEvaluationAI(BoardHelper.cloneBoard(board), myStone, hint);
-                    ai.think();
-                    putStone(ai.getRow(), ai.getColumn(), myStone);
-                    addAllListener();
-                }).start();
+                if (countStone(Stone.Empty) > 12) {
+                    new Thread(() -> {
+                        RandomAI ai = new RandomAI(hint);
+                        ai.think();
+                        putStone(ai.getRow(), ai.getColumn(), myStone);
+                    }).start();
+                }
+                else {
+                    new Thread(() -> {
+                        SquareEvaluationAI ai = new SquareEvaluationAI(board, myStone, 4, 10, hint);
+                        ai.think();
+                        putStone(ai.getRow(), ai.getColumn(), myStone);
+                        addAllListener();
+                    }).start();
+                }
             }
         }
     }

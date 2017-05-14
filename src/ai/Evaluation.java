@@ -5,21 +5,21 @@ import util.BoardHelper;
 import util.Stone;
 
 /**
+ * 自分と相手の局面の評価の差分を返すstaticメソッドを持つ
  * Created by shiita on 2017/05/10.
  */
 public class Evaluation {
-    public static final int SQUARE_EVALUATION = 1;
+    public enum EvaluationType { SQUARE, COUNT }
     private static final int[][] square =
             {{ 30, -12,  0, -1, -1,  0, -12,  30},
              {-12, -15, -3, -3, -3, -3, -15, -12},
              {  0,  -3,  0, -1, -1,  0,  -3,   0},
-             { -1,  -3, -1, -1, -1, -1,  -3,  -1},
-             { -1,  -3, -1, -1, -1, -1,  -3,  -1},
+             { -1,  -3, -1,  0,  0, -1,  -3,  -1},
+             { -1,  -3, -1,  0,  0, -1,  -3,  -1},
              {  0,  -3,  0, -1, -1,  0,  -3,   0},
              {-12, -15, -3, -3, -3, -3, -15, -12},
              { 30, -12,  0, -1, -1,  0, -12,  30},};
 
-    // 自分と相手の局面の評価の差分を返す
     public static int squareEvaluation(Stone stone, Stone[][] board) {
         Stone reverse = stone.getReverse();
         int value = 0;
@@ -42,5 +42,9 @@ public class Evaluation {
         }
 
         return value;
+    }
+
+    public static int countEvaluation(Stone stone, Stone[][] board) {
+        return BoardHelper.countStone(stone, board) - BoardHelper.countStone(stone.getReverse(), board);
     }
 }

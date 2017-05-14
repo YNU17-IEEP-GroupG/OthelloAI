@@ -1,6 +1,7 @@
 package ai;
 
 import othello.Othello;
+import util.BoardHelper;
 import util.Point;
 import util.Stone;
 
@@ -13,14 +14,18 @@ import java.util.Random;
 public class SquareEvaluationAI implements BaseAI {
     private Stone[][] board = new Stone[Othello.BOARD_SIZE][Othello.BOARD_SIZE];
     private Stone stone;
+    private int depth;
     private List<Point> hint;
     private int row;
     private int column;
+    private int countStart;
 
-    public SquareEvaluationAI(Stone[][] board, Stone stone, List<Point> hint) {
+    public SquareEvaluationAI(Stone[][] board, Stone stone, int depth, int countStart, List<Point> hint) {
         this.board = board;
         this.stone = stone;
         this.hint = hint;
+        this.depth = depth;
+        this.countStart = countStart;
         row = hint.get(0).row;
         column = hint.get(0).column;
     }
@@ -28,7 +33,11 @@ public class SquareEvaluationAI implements BaseAI {
     @Override
     public void think() {
         Search s = new Search(stone);
-        Point point = s.minMax(4, Evaluation.SQUARE_EVALUATION, stone, board);
+        Point point;
+        if (BoardHelper.countStone(Stone.Empty, board) > countStart)
+            point = s.minMax(depth, Evaluation.EvaluationType.SQUARE, stone, board);
+        else
+            point = s.untilEnd(Evaluation.EvaluationType.COUNT, stone, board);
         row = point.row;
         column = point.column;
     }

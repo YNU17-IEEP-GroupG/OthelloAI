@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -23,7 +24,6 @@ public class OthelloForAI {
     private boolean turn = false;
     private boolean passFlag = false;
     private String result;
-
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         List<String> results = IntStream.range(0, 100)
@@ -71,14 +71,14 @@ public class OthelloForAI {
             passFlag = false;
             BaseAI ai;
             if (turn) {
-                ai = new SquareEvaluationAI(board, nowStone, hint);
+                ai = new SquareEvaluationAI(board, nowStone, 4, 10, hint);
             }
             else {
-                ai = new RandomAI(hint);
+                ai = new SquareEvaluationAI(board, nowStone, 4, 0, hint);
             }
-//            if (new Random().nextDouble() <= 0.2)
-//                ai.randomThink();
-//            else
+            if (new Random().nextDouble() <= 0.2)
+                ai.randomThink();
+            else
                 ai.think();
             BoardHelper.putStone(ai.getRow(), ai.getColumn(), nowStone, board);
             nextTurn();
