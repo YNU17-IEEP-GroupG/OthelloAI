@@ -1,5 +1,6 @@
 package ai;
 
+
 import util.BoardHelper;
 import util.Point;
 import util.Stone;
@@ -19,37 +20,29 @@ public class Search {
         this.targetStone = targetStone;
     }
 
-    public Point beamSearch(Evaluation.EvaluationType type, Stone[][] board, int limit) {
+    public Point beamSearch(Evaluation.EvaluationType type, Stone[][] board, int limit, int depth) {
         List<Status> evaluated = new ArrayList<>();
         List<Status> beam;
 
         // beamの初期化
         beam = calcNewStatus(new Status(0, new ArrayList<>(), targetStone.getReverse(), board), type);
         beam = updateBeam(beam, limit);
-        while (!beam.isEmpty()) {
+        while (!beam.isEmpty() && depth >= 0) {
             int size = beam.size();
             for (int j = 0; j < size; j++) {
                 Status s = beam.get(0);
                 beam.remove(0);
-                if (s.stone == targetStone) {
+                if (s.stone == targetStone)
                     evaluated.add(s);
-                }
-                s = new Status(s.value, s.path, s.stone.getReverse(), s.board);
                 List<Status> newS = calcNewStatus(s, type);
                 beam.addAll(newS);
             }
-
             beam = updateBeam(beam, limit);
+            depth--;
         }
-        evaluated.forEach(status -> {
-            System.out.print("value = " + status.value);
-            status.printPath();
-            System.out.println();
-        });
         evaluated = evaluated.stream()
                 .sorted(Comparator.comparing(Status::getValue, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
-        System.out.println("last value =" +  evaluated.get(0).value);
         return evaluated.get(0).path.get(0);
     }
 
@@ -59,7 +52,7 @@ public class Search {
         List<Point> hint = BoardHelper.makeHint(reverse, status.board);
         for (Point point : hint) {
             Stone[][] newBoard = BoardHelper.cloneBoard(status.board);
-            BoardHelper.putStone(point.row, point.column, reverse, newBoard);
+            BoardHelper.putStone(point.getRow(), point.getColumn(), reverse, newBoard);
             int value = evaluate(type, reverse, newBoard);
             List<Point> path = new ArrayList<>();
             for (Point p : status.path) path.add(p);
@@ -72,12 +65,6 @@ public class Search {
     private List<Status> updateBeam(List<Status> beam, int limit) {
         int l = Math.min(beam.size(), limit);
         if (l == 0) return new ArrayList<>();
-        if (beam.get(0).stone == targetStone)
-            return beam.stream()
-                .sorted(Comparator.comparing(Status::getValue, Comparator.naturalOrder()))
-                .limit(l)
-                .collect(Collectors.toList());
-        else
             return beam.stream()
                     .sorted(Comparator.comparing(Status::getValue, Comparator.reverseOrder()))
                     .limit(l)
@@ -90,9 +77,9 @@ public class Search {
         List<Point> hint = BoardHelper.makeHint(stone, board);
         Point bestPoint = hint.get(0);
         for (Point p : hint) {
-            List<Point> pList = BoardHelper.putStone(p.row, p.column, stone, board);
+            List<Point> pList = BoardHelper.putStone(p.getRow(), p.getColumn(), stone, board);
             triple = uEnd(type, stone.getReverse(), board);
-            BoardHelper.undo(p.row, p.column, stone, pList, board);
+            BoardHelper.undo(p.getRow(), p.getColumn(), stone, pList, board);
             if (triple.winPer > bestTriple.winPer) {
                 bestTriple.winPer = triple.winPer;
                 bestTriple.value = triple.value;
@@ -124,9 +111,9 @@ public class Search {
         int count = 0;
         int value = stone == targetStone ? -(1 << 29) : (1 << 29);
         for (Point p : hint) {
-            List<Point> pList = BoardHelper.putStone(p.row, p.column, stone, board);
+            List<Point> pList = BoardHelper.putStone(p.getRow(), p.getColumn(), stone, board);
             Triple triple = uEnd(type, stone.getReverse(), board);
-            BoardHelper.undo(p.row, p.column, stone, pList, board);
+            BoardHelper.undo(p.getRow(), p.getColumn(), stone, pList, board);
 
             // 目的の石の場合には最も良いものを選択
             if (stone == targetStone) {
@@ -160,9 +147,9 @@ public class Search {
 
         List<Point> hint = BoardHelper.makeHint(stone, board);
         for (Point p : hint) {
-            List<Point> pList = BoardHelper.putStone(p.row, p.column, stone, board);
+            List<Point> pList = BoardHelper.putStone(p.getRow(), p.getColumn(), stone, board);
             int value = alphaBeta(depth - 1, type, stone.getReverse(), board, alpha, beta);
-            BoardHelper.undo(p.row, p.column, stone, pList, board);
+            BoardHelper.undo(p.getRow(), p.getColumn(), stone, pList, board);
             if (value > alpha) {
                 bestPoint = p;
                 alpha = value;
@@ -186,9 +173,9 @@ public class Search {
             return stone == targetStone ? alpha : beta;
         }
         for (Point p : hint) {
-            List<Point> pList = BoardHelper.putStone(p.row, p.column, stone, board);
+            List<Point> pList = BoardHelper.putStone(p.getRow(), p.getColumn(), stone, board);
             value = alphaBeta(depth - 1, type, stone.getReverse(), board, alpha, beta);
-            BoardHelper.undo(p.row, p.column, stone, pList, board);
+            BoardHelper.undo(p.getRow(), p.getColumn(), stone, pList, board);
             if (stone == targetStone && value > alpha) {
                 alpha = value;
                 if (alpha > beta) return alpha;
@@ -240,8 +227,9 @@ public class Search {
 
         public void printPath() {
             path.stream().forEach(p -> {
-                System.out.print("(" + p.row + ", " + p.column + "), ");
+                System.out.print("(" + p.getRow() + ", " + p.getColumn() + "), ");
             });
         }
     }
 }
+

@@ -20,6 +20,22 @@ public class Point {
             throw new PointException("Pointの列の値が範囲外です。");
     }
 
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public void setColumn(int column) {
+        this.column = column;
+    }
+
     @Override
     public String toString() {
         return String.format("(row, column) = (%d, %d)", row, column);

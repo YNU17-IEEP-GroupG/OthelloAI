@@ -1,7 +1,7 @@
 package othello;
 
-import ai.RandomAI;
-import ai.SquareEvaluationAI;
+import ai.AlphaAI;
+import ai.BetaAI;
 import util.*;
 
 import javax.swing.*;
@@ -122,31 +122,15 @@ public class Othello extends JFrame implements ActionListener {
             passFlag = false;
             if (myTurn) {
                 displayHint(hint);
-                if (countStone(Stone.Empty) > 12) {
-                    new Thread(() -> {
-                        RandomAI ai = new RandomAI(hint);
-                        ai.think();
-                        putStone(ai.getRow(), ai.getColumn(), myStone);
-                    }).start();
-                }
             }
             else {
                 removeAllListener();
-                if (countStone(Stone.Empty) > 12) {
-                    new Thread(() -> {
-                        RandomAI ai = new RandomAI(hint);
-                        ai.think();
-                        putStone(ai.getRow(), ai.getColumn(), myStone);
-                    }).start();
-                }
-                else {
-                    new Thread(() -> {
-                        SquareEvaluationAI ai = new SquareEvaluationAI(board, myStone, 4, 10, hint);
-                        ai.think();
-                        putStone(ai.getRow(), ai.getColumn(), myStone);
-                        addAllListener();
-                    }).start();
-                }
+                new Thread(() -> {
+                    BetaAI ai = new BetaAI(hint, myStone, board, 2);
+                    ai.think();
+                    putStone(ai.getRow(), ai.getColumn(), myStone);
+                    addAllListener();
+                }).start();
             }
         }
     }

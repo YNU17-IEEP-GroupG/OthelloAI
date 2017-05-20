@@ -1,8 +1,10 @@
 package othello;
 
+import ai.AlphaAI;
 import ai.BaseAI;
-import ai.RandomAI;
-import ai.SquareEvaluationAI;
+import ai.BetaAI;
+import ai.GammaAI;
+import ai.OmegaAI;
 import util.BoardHelper;
 import util.Point;
 import util.Stone;
@@ -26,7 +28,7 @@ public class OthelloForAI {
     private String result;
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        List<String> results = IntStream.range(0, 100)
+        List<String> results = IntStream.range(0, 1000)
                 .parallel()
                 .mapToObj(i -> new OthelloForAI())
                 .map(o -> o.getResult())
@@ -46,6 +48,7 @@ public class OthelloForAI {
     }
 
     public String getResult() {
+        System.out.println(result);
         return result;
     }
 
@@ -71,10 +74,10 @@ public class OthelloForAI {
             passFlag = false;
             BaseAI ai;
             if (turn) {
-                ai = new SquareEvaluationAI(board, nowStone, 4, 10, hint);
+                ai = new OmegaAI(hint, nowStone, board, 2);
             }
             else {
-                ai = new SquareEvaluationAI(board, nowStone, 4, 0, hint);
+                ai = new BetaAI(hint, nowStone, board, 2);
             }
             if (new Random().nextDouble() <= 0.2)
                 ai.randomThink();
